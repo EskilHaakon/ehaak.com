@@ -234,16 +234,7 @@ html, body {
     color: var(--dark-grey);
 }
 
-#panel-br-link svg line,
-#panel-br-link svg polyline {
-    stroke: var(--light-grey);
-    transition: stroke 0.15s;
-}
 
-#panel-bottom-right:hover #panel-br-link svg line,
-#panel-bottom-right:hover #panel-br-link svg polyline {
-    stroke: var(--dark-grey);
-}
 
 #secondary-container {
     width: 100vw;
