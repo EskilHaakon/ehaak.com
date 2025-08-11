@@ -324,13 +324,13 @@ html, body {
 
 @media (max-width: 900px) {
     .justified-text {
-        max-width: 228px;
+        max-width: 229px;
     }
 }
 
 @media (max-width: 600px) {
     .justified-text {
-        max-width: 193px;
+        max-width: 194px;
     }
 }
 
