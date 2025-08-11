@@ -10,16 +10,118 @@
     <div id="main-container">
         <div id="panel-top-left" class="panel"><a id="panel-tl-link" href="#">Eskil <br> Haakonsson</a></div>
         <div id="panel-top-right" class="panel"><a id="panel-tr-link" href="#">Projects</a></div>
+        <div id="fixed-text-tr">
+            <div id="accordion-container">
+                <div class="accordion-wrapper">
+                    <div class="accordion-content">
+                        <div class="space-y-1">
+                            <div class="space-y-1">
+                                                               <button class="accordion-trigger" data-panel="architecture" aria-expanded="false" aria-controls="panel-architecture">
+                                   Architecture<br><br>
+                               </button>
+                                                               <div class="accordion-panel" id="panel-architecture" data-panel="architecture" style="display: none;">
+                                   <div class="accordion-grid" style="display: inline-grid; gap: 8px;">
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                                               <button class="accordion-trigger" data-panel="publication" aria-expanded="false" aria-controls="panel-publication">
+                                   <br>Publication<br><br>
+                               </button>
+                                                               <div class="accordion-panel" id="panel-publication" data-panel="publication" style="display: none;">
+                                   <div class="accordion-grid" style="display: inline-grid; gap: 8px;">
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                        <a href="#" style="background-color: #000; width: 100%;"></a>
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                                               <button class="accordion-trigger" data-panel="objects" aria-expanded="false" aria-controls="panel-objects">
+                                   <br>Objects<br><br>
+                               </button>
+                                                               <div class="accordion-panel" id="panel-objects" data-panel="objects" style="display: none;">
+                                   <div class="accordion-grid" style="display: inline-grid; gap: 8px;">
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                                               <button class="accordion-trigger" data-panel="visual" aria-expanded="false" aria-controls="panel-visual">
+                                   <br>Visual / Other<br><br>
+                               </button>
+                                                               <div class="accordion-panel" id="panel-visual" data-panel="visual" style="display: none;">
+                                   <div class="accordion-grid" style="display: inline-grid; gap: 8px;">
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                        <a href="#" style="background-color: #000; width: 100%; display: block;"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="panel-bottom-left" class="panel">
             <a id="panel-bl-link" href="#">About</a>
-            <div id="fixed-text">b. 2002 <br><br> Student of architecture and civil engineering at Chalmers University of Technology. Currently  <br><br> I made this website with HTML, CSS and JS. It's hosted on Github for free.</div>
         </div>
+        <div id="fixed-text">b. 2002. <br><br> <span class="justified-text">Student of architecture and engineering at Chalmers University of Technology. Interested in materiality, re-use and spatial composition.</span>
+            <br><br> <a href="mailto:eskil.hakonsson@gmail.com" class="clickable-text">eskil.hakonsson@gmail.com</a><br> 
+            <a href="tel:+46707736386" class="clickable-text">+46 70 773 63 86</a>
+
+        
+            </div>
 
         <div id="panel-bottom-right" class="panel"><a id="panel-br-link" href="#">Gallery</a></div>
         <div id="square1"></div>
         <div id="square2"></div>
         <div id="center-panel" class="panel"><a id="center-panel-link" href="#">Architecture <br> Portfolio PDF</a></div>
     </div>
+    
+    <!-- Second container with four panels -->
+    <div id="second-container">
+        <div class="second-panel" id="second-panel-1"></div>
+        <div class="second-panel" id="second-panel-2"></div>
+        <div class="second-panel" id="second-panel-3"></div>
+        <div class="second-panel" id="second-panel-4"></div>
+    </div>
+    
+    <!-- Third container with two panels -->
+    <div id="third-container">
+        <div class="third-panel-left" id="third-panel-left">
+            <a href="#" class="third-panel-link"></a>
+        </div>
+        <div class="third-panel-right" id="third-panel-right">
+            <div class="third-panel-text">Torslanda bath<br>2025</div>
+        </div>
+    </div>
+    
+    <!-- Fourth container with two panels (Container B) -->
+    <div id="fourth-container">
+        <div class="fourth-panel-left" id="fourth-panel-left">
+            <a href="#" class="fourth-panel-link"></a>
+        </div>
+        <div class="fourth-panel-right" id="fourth-panel-right">
+            <div class="fourth-panel-text">Torslanda bath<br>2025</div>
+        </div>
+    </div>
+    
+    <!-- Bottom container with one panel -->
+    <div id="bottom-container">
+        <div class="bottom-panel" id="bottom-panel"></div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1/bundled/lenis.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>  

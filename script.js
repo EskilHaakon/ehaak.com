@@ -67,27 +67,45 @@ function updatePanels() {
     let containerRect = container.getBoundingClientRect();
     let centerPanelRect = centerPanel.getBoundingClientRect();
     
+    // Update body class for CSS mode-specific styling (only when not animating and on desktop)
+    if (!animating && window.innerWidth > 600) {
+        if (currentMode === 'square2' || square1InExtendedMode || (currentMode === 'square1' && square1Extended)) {
+            document.body.classList.add('square2-mode');
+        } else {
+            document.body.classList.remove('square2-mode');
+        }
+    } else {
+        // Remove class on narrow screens
+        document.body.classList.remove('square2-mode');
+    }
+    
     let gap = 12;
     let square1Pos = { x: 0, y: 0 };
     let square2Pos = { x: 0, y: 0 };
+    let squareSize = 8;
     
     if (square1) {
         let square1Rect = square1.getBoundingClientRect();
         square1Pos = {
-            x: Math.round(square1Rect.left + square1Rect.width / 2 - containerRect.left),
-            y: Math.round(square1Rect.top + square1Rect.height / 2 - containerRect.top)
+            x: Math.round(square1Rect.left - containerRect.left),
+            y: Math.round(square1Rect.top - containerRect.top)
         };
     }
     
     if (square2) {
         let square2Rect = square2.getBoundingClientRect();
         square2Pos = {
-            x: Math.round(square2Rect.left + square2Rect.width / 2 - containerRect.left),
-            y: Math.round(square2Rect.top + square2Rect.height / 2 - containerRect.top)
+            x: Math.round(square2Rect.left - containerRect.left),
+            y: Math.round(square2Rect.top - containerRect.top)
         };
     }
     
     let activeSquare = currentMode === 'square1' ? square1Pos : square2Pos;
+    // Calculate actual square corners (squares are positioned by their top-left corner)
+    let squareTopLeft = { x: activeSquare.x, y: activeSquare.y };
+    let squareTopRight = { x: activeSquare.x + 8, y: activeSquare.y };
+    let squareBottomLeft = { x: activeSquare.x, y: activeSquare.y + 8 };
+    let squareBottomRight = { x: activeSquare.x + 8, y: activeSquare.y + 8 };
     
     let pTL = document.getElementById('panel-top-left');
     let pTR = document.getElementById('panel-top-right');
@@ -95,119 +113,117 @@ function updatePanels() {
     let pBR = document.getElementById('panel-bottom-right');
     
     if (currentMode === 'square1') {
-        // Square1 mode
-        let midX = containerRect.width / 2;
-        
-        // Top panels - behavior depends on extended mode
+        let midX = Math.round(containerRect.width / 2);
         if (square1InExtendedMode) {
-            // Check if square1 has passed the middle of the screen
             let hasPassedMiddle = activeSquare.x > midX;
-            
             if (hasPassedMiddle) {
-                // Square1 has passed middle: top panels follow Y-axis only, horizontally centered
+                // Top panels follow Y only, horizontally centered
+                let topPanelWidth = (containerRect.width - gap - gap - 8) / 2; // Total width minus gaps, divided by 2
                 pTL.style.left = gap + 'px';
                 pTL.style.top = gap + 'px';
-                pTL.style.width = (midX - 6 - gap) + 'px';
-                pTL.style.height = (activeSquare.y - 6 - gap) + 'px';
+                pTL.style.width = topPanelWidth + 'px';
+                pTL.style.height = (squareTopLeft.y - gap) + 'px';
                 
-                pTR.style.left = (midX + 6) + 'px';
+                pTR.style.left = (gap + topPanelWidth + 8) + 'px'; // Left gap + panel width + 8px gap
                 pTR.style.top = gap + 'px';
-                pTR.style.width = (containerRect.width - midX - 6 - gap) + 'px';
-                pTR.style.height = (activeSquare.y - 6 - gap) + 'px';
+                pTR.style.width = topPanelWidth + 'px';
+                pTR.style.height = (squareTopRight.y - gap) + 'px';
             } else {
-                // Square1 hasn't passed middle: top panels follow both X and Y axes
+                // Top panels follow both X and Y
                 pTL.style.left = gap + 'px';
                 pTL.style.top = gap + 'px';
-                pTL.style.width = (activeSquare.x - 6 - gap) + 'px';
-                pTL.style.height = (activeSquare.y - 6 - gap) + 'px';
+                pTL.style.width = (squareTopLeft.x - gap) + 'px';
+                pTL.style.height = (squareTopLeft.y - gap) + 'px';
                 
-                pTR.style.left = (activeSquare.x + 6) + 'px';
+                pTR.style.left = (squareTopRight.x) + 'px';
                 pTR.style.top = gap + 'px';
-                pTR.style.width = (containerRect.width - activeSquare.x - 6 - gap) + 'px';
-                pTR.style.height = (activeSquare.y - 6 - gap) + 'px';
+                pTR.style.width = (containerRect.width - squareTopRight.x - gap) + 'px';
+                pTR.style.height = (squareTopRight.y - gap) + 'px';
             }
         } else {
             // Normal mode: top panels always overlap center panel
             pTL.style.left = gap + 'px';
             pTL.style.top = gap + 'px';
-            pTL.style.width = (activeSquare.x - 6 - gap) + 'px';
-            pTL.style.height = (activeSquare.y - 6 - gap) + 'px';
+            pTL.style.width = (squareTopLeft.x - gap) + 'px';
+            pTL.style.height = (squareTopLeft.y - gap) + 'px';
             
-            pTR.style.left = (activeSquare.x + 6) + 'px';
+            pTR.style.left = (squareTopRight.x) + 'px';
             pTR.style.top = gap + 'px';
-            pTR.style.width = (containerRect.width - activeSquare.x - 6 - gap) + 'px';
-            pTR.style.height = (activeSquare.y - 6 - gap) + 'px';
+            pTR.style.width = (containerRect.width - squareTopRight.x - gap) + 'px';
+            pTR.style.height = (squareTopRight.y - gap) + 'px';
         }
-        
-        // Bottom panels - behavior depends on extended mode
+        // Bottom panels
         if (square1InExtendedMode) {
-            // Check if square1 has passed the middle of the screen
             let hasPassedMiddle = activeSquare.x > midX;
-            
             if (hasPassedMiddle) {
-                // Square1 has passed middle: bottom panels can follow both X and Y axes
+                // Bottom panels follow both X and Y
                 pBL.style.left = gap + 'px';
-                pBL.style.top = (activeSquare.y + 6) + 'px';
-                pBL.style.width = (activeSquare.x - 6 - gap) + 'px';
-                pBL.style.height = (containerRect.height - activeSquare.y - 6 - gap) + 'px';
+                pBL.style.top = (squareBottomLeft.y) + 'px';
+                pBL.style.width = (squareBottomLeft.x - gap) + 'px';
+                pBL.style.height = (containerRect.height - squareBottomLeft.y - 8) + 'px';
                 
-                pBR.style.left = (activeSquare.x + 6) + 'px';
-                pBR.style.top = (activeSquare.y + 6) + 'px';
-                pBR.style.width = (containerRect.width - activeSquare.x - 6 - gap) + 'px';
-                pBR.style.height = (containerRect.height - activeSquare.y - 6 - gap) + 'px';
+                pBR.style.left = (squareBottomRight.x) + 'px';
+                pBR.style.top = (squareBottomRight.y) + 'px';
+                pBR.style.width = (containerRect.width - squareBottomRight.x - gap) + 'px';
+                pBR.style.height = (containerRect.height - squareBottomRight.y - 8) + 'px';
             } else {
-                // Square1 hasn't passed middle: bottom panels follow Y-axis only
+                // Bottom panels follow Y only
+                let bottomPanelWidth = (containerRect.width - gap - gap - 8) / 2; // Total width minus gaps, divided by 2
                 pBL.style.left = gap + 'px';
-                pBL.style.top = (activeSquare.y + 6) + 'px';
-                pBL.style.width = (midX - 6 - gap) + 'px';
-                pBL.style.height = (containerRect.height - activeSquare.y - 6 - gap) + 'px';
+                pBL.style.top = (squareBottomLeft.y) + 'px';
+                pBL.style.width = bottomPanelWidth + 'px';
+                pBL.style.height = (containerRect.height - squareBottomLeft.y - 8) + 'px';
                 
-                pBR.style.left = (midX + 6) + 'px';
-                pBR.style.top = (activeSquare.y + 6) + 'px';
-                pBR.style.width = (containerRect.width - midX - 6 - gap) + 'px';
-                pBR.style.height = (containerRect.height - activeSquare.y - 6 - gap) + 'px';
+                pBR.style.left = (gap + bottomPanelWidth + 8) + 'px'; // Left gap + panel width + 8px gap
+                pBR.style.top = (squareBottomRight.y) + 'px';
+                pBR.style.width = bottomPanelWidth + 'px';
+                pBR.style.height = (containerRect.height - squareBottomRight.y - 8) + 'px';
             }
         } else {
             // Normal mode: only follow Y-value, restricted by center panel
+            // Bottom panels should be positioned at the square's bottom edge, with gap between them
+            let blTop = Math.max(centerPanelRect.bottom - containerRect.top + 8, squareBottomLeft.y);
+            let panelWidth = (containerRect.width - gap - gap - 8) / 2; // Total width minus gaps, divided by 2
             pBL.style.left = gap + 'px';
-            pBL.style.top = Math.max(centerPanelRect.bottom - containerRect.top + gap, activeSquare.y + 6) + 'px';
-            pBL.style.width = (midX - 6 - gap) + 'px';
-            pBL.style.height = (containerRect.height - Math.max(centerPanelRect.bottom - containerRect.top + gap, activeSquare.y + 6) - gap) + 'px';
+            pBL.style.top = blTop + 'px';
+            pBL.style.width = panelWidth + 'px';
+            pBL.style.height = (containerRect.height - blTop - 8) + 'px';
             
-            pBR.style.left = (midX + 6) + 'px';
-            pBR.style.top = Math.max(centerPanelRect.bottom - containerRect.top + gap, activeSquare.y + 6) + 'px';
-            pBR.style.width = (containerRect.width - midX - 6 - gap) + 'px';
-            pBR.style.height = (containerRect.height - Math.max(centerPanelRect.bottom - containerRect.top + gap, activeSquare.y + 6) - gap) + 'px';
+            let brTop = Math.max(centerPanelRect.bottom - containerRect.top + 8, squareBottomRight.y);
+            pBR.style.left = (gap + panelWidth + 8) + 'px'; // Left gap + panel width + 8px gap
+            pBR.style.top = brTop + 'px';
+            pBR.style.width = panelWidth + 'px';
+            pBR.style.height = (containerRect.height - brTop - 8) + 'px';
         }
     } else {
         // Square2 mode
-        let midX = containerRect.width / 2;
-        
+        let midX = Math.round(containerRect.width / 2);
         // Top panels - only follow Y-value, restricted by center panel
+        let topPanelWidth = (containerRect.width - gap - gap - 8) / 2; // Total width minus gaps, divided by 2
         pTL.style.left = gap + 'px';
         pTL.style.top = gap + 'px';
-        pTL.style.width = (midX - 6 - gap) + 'px';
-        pTL.style.height = (Math.min(centerPanelRect.top - containerRect.top - gap, activeSquare.y - 6) - gap) + 'px';
+        pTL.style.width = topPanelWidth + 'px';
+        pTL.style.height = (Math.min(centerPanelRect.top - containerRect.top - 8, squareTopLeft.y) - gap) + 'px';
         
-        pTR.style.left = (midX + 6) + 'px';
+        pTR.style.left = (gap + topPanelWidth + 8) + 'px'; // Left gap + panel width + 8px gap
         pTR.style.top = gap + 'px';
-        pTR.style.width = (containerRect.width - midX - 6 - gap) + 'px';
-        pTR.style.height = (Math.min(centerPanelRect.top - containerRect.top - gap, activeSquare.y - 6) - gap) + 'px';
-        
+        pTR.style.width = topPanelWidth + 'px';
+        pTR.style.height = (Math.min(centerPanelRect.top - containerRect.top - 8, squareTopRight.y) - gap) + 'px';
         // Bottom panels - always overlap center panel
         pBL.style.left = gap + 'px';
-        pBL.style.top = (activeSquare.y + 6) + 'px';
-        pBL.style.width = (activeSquare.x - 6 - gap) + 'px';
-        pBL.style.height = (containerRect.height - activeSquare.y - 6 - gap) + 'px';
+        pBL.style.top = (squareBottomLeft.y) + 'px';
+        pBL.style.width = (squareBottomLeft.x - gap) + 'px';
+        pBL.style.height = (containerRect.height - squareBottomLeft.y - 8) + 'px';
         
-        pBR.style.left = (activeSquare.x + 6) + 'px';
-        pBR.style.top = (activeSquare.y + 6) + 'px';
-        pBR.style.width = (containerRect.width - activeSquare.x - 6 - gap) + 'px';
-        pBR.style.height = (containerRect.height - activeSquare.y - 6 - gap) + 'px';
+        pBR.style.left = (squareBottomRight.x) + 'px';
+        pBR.style.top = (squareBottomRight.y) + 'px';
+        pBR.style.width = (containerRect.width - squareBottomRight.x - gap) + 'px';
+        pBR.style.height = (containerRect.height - squareBottomRight.y - 8) + 'px';
     }
-    
     // Update fixed text clipping based on bottom-left panel
     updateFixedTextClipping();
+    // Update fixed text clipping based on top-right panel
+    updateFixedTextTRClipping();
 }
 
 function updateSquare1() {
@@ -216,11 +232,11 @@ function updateSquare1() {
     let containerRect = container.getBoundingClientRect();
     let centerPanelRect = centerPanel.getBoundingClientRect();
     
-    let x = containerRect.width / 2;
-    let y = centerPanelRect.top - containerRect.top - 6; // Bottom of square touches top of center panel
+    let x = Math.round(containerRect.width / 2);
+    let y = centerPanelRect.top - containerRect.top - 4; // Bottom of square touches top of center panel
     
-    square1.style.left = (x - 6) + 'px';
-    square1.style.top = (y - 6) + 'px';
+    square1.style.left = (x - 4) + 'px';
+    square1.style.top = (y - 4) + 'px';
 }
 
 function updateSquare2() {
@@ -229,11 +245,11 @@ function updateSquare2() {
     let containerRect = container.getBoundingClientRect();
     let centerPanelRect = centerPanel.getBoundingClientRect();
     
-    let x = containerRect.width / 2;
-    let y = centerPanelRect.bottom - containerRect.top + 6; // Top of square touches bottom of center panel
+    let x = Math.round(containerRect.width / 2);
+    let y = centerPanelRect.bottom - containerRect.top + 4; // Top of square touches bottom of center panel
     
-    square2.style.left = (x - 6) + 'px';
-    square2.style.top = (y - 6) + 'px';
+    square2.style.left = (x - 4) + 'px';
+    square2.style.top = (y - 4) + 'px';
 }
 
 function animateSquare1() {
@@ -242,7 +258,7 @@ function animateSquare1() {
     animating = true;
     clickLocked = true;
     let startTime = performance.now();
-    let duration = window.innerWidth <= 600 ? 800 : 1000; // Faster on narrow screens
+    let duration = window.innerWidth <= 600 ? 700 : 900; // Faster on narrow screens
     
     function animate(currentTime) {
         let elapsed = currentTime - startTime;
@@ -292,8 +308,8 @@ function animateSquare1() {
                 Math.pow(t, 3) * endPos.y;
         }
         
-        square1.style.left = (x - 6) + 'px';
-        square1.style.top = (y - 6) + 'px';
+        square1.style.left = (x - 4) + 'px';
+        square1.style.top = (y - 4) + 'px';
         
         updatePanels();
         
@@ -303,6 +319,8 @@ function animateSquare1() {
             animating = false;
             clickLocked = false;
             atStart = !atStart;
+            // Update body class after animation completes
+            updatePanels();
         }
     }
     
@@ -315,7 +333,7 @@ function animateSquare2() {
     animating = true;
     clickLocked = true;
     let startTime = performance.now();
-    let duration = window.innerWidth <= 600 ? 800 : 1000; // Faster on narrow screens
+    let duration = window.innerWidth <= 600 ? 700 : 900; // Faster on narrow screens
     
     function animate(currentTime) {
         let elapsed = currentTime - startTime;
@@ -365,8 +383,8 @@ function animateSquare2() {
                 Math.pow(t, 3) * endPos.y;
         }
         
-        square2.style.left = (x - 6) + 'px';
-        square2.style.top = (y - 6) + 'px';
+        square2.style.left = (x - 4) + 'px';
+        square2.style.top = (y - 4) + 'px';
         
         updatePanels();
         
@@ -381,12 +399,15 @@ function animateSquare2() {
                 currentMode = 'square1';
                 square1Extended = false; // Reset extended flags
                 square1InExtendedMode = false;
+                // Teleport square1 back to its start position
                 updateSquare1();
                 updatePanels();
             } else if (currentMode === 'square2' && !atStart) {
                 // Square2 has reached its end position, teleport square1 to square2's end position
                 teleportSquare1ToSquare2EndPosition();
             }
+            // Update body class after animation completes
+            updatePanels();
         }
     }
     
@@ -399,7 +420,7 @@ function animateSquare1ToSquare2Position() {
     animating = true;
     clickLocked = true;
     let startTime = performance.now();
-    let duration = window.innerWidth <= 600 ? 1200 : 1500; // Longer duration for S-curve movement
+    let duration = window.innerWidth <= 600 ? 1000 : 1400; // Longer duration for S-curve movement
     
     // Make center panel transparent during movement
     centerPanel.style.opacity = '0';
@@ -407,20 +428,18 @@ function animateSquare1ToSquare2Position() {
     // Calculate square2's end position for square1 to move to
     let container = document.getElementById('main-container');
     let containerRect = container.getBoundingClientRect();
-    let gap = 8;
+    let gap = 12;
     
-    // Calculate square2's end position
-    let estimatedTextWidth = window.innerWidth <= 600 ? 50 : window.innerWidth <= 900 ? 70 : 80; // Responsive width for "Gallery" text
-    let textRight = containerRect.width - gap - 6; // Right edge of text (container width - gap - text-to-border gap)
+    // Calculate square2's end position based on gap alignment
     let h = containerRect.height;
-    let verticalPercent = window.innerWidth <= 600 ? 0.45 : 0.47;
+    let verticalPercent = window.innerWidth <= 600 ? 0.46 : 0.475;
     
     // Use square2's start position (below center panel) as reference
     let centerPanelRect = centerPanel.getBoundingClientRect();
-    let square2StartY = centerPanelRect.bottom - containerRect.top + 6;
+    let square2StartY = centerPanelRect.bottom - containerRect.top + 4;
     
     let square2EndPos = {
-        x: textRight - estimatedTextWidth - gap - 6,
+        x: gap + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 8 + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 8 + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 4, // Left gap + 3 panels + 2 gaps + half gap
         y: square2StartY - h * verticalPercent
     };
     
@@ -456,8 +475,8 @@ function animateSquare1ToSquare2Position() {
                 3 * (1 - t) * Math.pow(t, 2) * control2Y + 
                 Math.pow(t, 3) * square2EndPos.y;
         
-        square1.style.left = (x - 6) + 'px';
-        square1.style.top = (y - 6) + 'px';
+        square1.style.left = (x - 4) + 'px';
+        square1.style.top = (y - 4) + 'px';
         
         updatePanels();
         
@@ -472,8 +491,11 @@ function animateSquare1ToSquare2Position() {
             startPos = square1CurrentPos;
             endPos = square2EndPos;
             
-            // Move square2 to its end position
+            // Move square2 to its end position and teleport square1 to square2's end position
             animateSquare2ToEndPosition();
+            teleportSquare1ToSquare2EndPosition();
+            // Update body class after animation completes
+            updatePanels();
         }
     }
     
@@ -499,16 +521,14 @@ function animateSquare2ToEndPosition() {
     // Calculate square2's end position
     let container = document.getElementById('main-container');
     let containerRect2 = container.getBoundingClientRect();
-    let gap = 8;
-    let estimatedTextWidth = window.innerWidth <= 600 ? 60 : window.innerWidth <= 900 ? 70 : 80;
-    let textRight = containerRect2.width - gap - 6;
+    let gap = 12;
     let h = containerRect2.height;
-    let verticalPercent = window.innerWidth <= 600 ? 0.45 : 0.47;
+    let verticalPercent = window.innerWidth <= 600 ? 0.46 : 0.475;
     let centerPanelRect = centerPanel.getBoundingClientRect();
-    let square2StartY = centerPanelRect.bottom - containerRect2.top + 6;
+    let square2StartY = centerPanelRect.bottom - containerRect2.top + 4;
     
     let square2EndPos = {
-        x: textRight - estimatedTextWidth - gap - 6,
+        x: gap + (containerRect2.width - gap - gap - 8 - 8 - 8) / 4 + 8 + (containerRect2.width - gap - gap - 8 - 8 - 8) / 4 + 8 + (containerRect2.width - gap - gap - 8 - 8 - 8) / 4 + 4, // Left gap + 3 panels + 2 gaps + half gap
         y: square2StartY - h * verticalPercent
     };
     
@@ -538,8 +558,8 @@ function animateSquare2ToEndPosition() {
                 3 * (1 - t) * Math.pow(t, 2) * control2Y + 
                 Math.pow(t, 3) * square2EndPos.y;
         
-        square2.style.left = (x - 6) + 'px';
-        square2.style.top = (y - 6) + 'px';
+        square2.style.left = (x - 4) + 'px';
+        square2.style.top = (y - 4) + 'px';
         
         updatePanels();
         
@@ -548,6 +568,8 @@ function animateSquare2ToEndPosition() {
         } else {
             animating = false;
             clickLocked = false;
+            // Update body class after animation completes
+            updatePanels();
         }
     }
     
@@ -560,7 +582,7 @@ function animateSquare1FromSquare2ToSquare1Position() {
     animating = true;
     clickLocked = true;
     let startTime = performance.now();
-    let duration = window.innerWidth <= 600 ? 1200 : 1500; // Longer duration for S-curve movement
+    let duration = window.innerWidth <= 600 ? 1000 : 1400; // Longer duration for S-curve movement
     
     // Make center panel transparent during movement
     centerPanel.style.opacity = '0';
@@ -568,18 +590,16 @@ function animateSquare1FromSquare2ToSquare1Position() {
     // Calculate square1's end position (where it should go back to)
     let container = document.getElementById('main-container');
     let containerRect = container.getBoundingClientRect();
-    let gap = 8;
+    let gap = 12;
     
-    // Calculate square1's end position
-    let estimatedTextWidth = window.innerWidth <= 600 ? 65 : window.innerWidth <= 900 ? 85 : 105; // Responsive width for "Eskil Haakonsson" text
-    let textLeft = gap + 6; // Left edge of text (gap + text-to-border gap)
+    // Calculate square1's end position based on 25% of container width
     let h = containerRect.height;
-    let verticalPercent = window.innerWidth <= 600 ? 0.48 : 0.5;
+    let verticalPercent = window.innerWidth <= 600 ? 0.49 : 0.503;
     let centerPanelRect = centerPanel.getBoundingClientRect();
-    let square1StartY = centerPanelRect.top - containerRect.top - 6;
+    let square1StartY = centerPanelRect.top - containerRect.top - 4;
     
     let square1EndPos = {
-        x: textLeft + estimatedTextWidth + gap + 6,
+        x: gap + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 4, // Left gap + panel width + half gap
         y: square1StartY + h * verticalPercent
     };
     
@@ -615,8 +635,8 @@ function animateSquare1FromSquare2ToSquare1Position() {
                 3 * (1 - t) * Math.pow(t, 2) * control2Y + 
                 Math.pow(t, 3) * square1EndPos.y;
         
-        square1.style.left = (x - 6) + 'px';
-        square1.style.top = (y - 6) + 'px';
+        square1.style.left = (x - 4) + 'px';
+        square1.style.top = (y - 4) + 'px';
         
         updatePanels();
         
@@ -636,6 +656,8 @@ function animateSquare1FromSquare2ToSquare1Position() {
             
             // Teleport square2 back to its start position
             updateSquare2();
+            // Update body class after animation completes
+            updatePanels();
         }
     }
     
@@ -646,22 +668,20 @@ function teleportSquare1ToSquare2EndPosition() {
     // Calculate square2's end position
     let container = document.getElementById('main-container');
     let containerRect = container.getBoundingClientRect();
-    let gap = 8;
-    let estimatedTextWidth = window.innerWidth <= 600 ? 50 : window.innerWidth <= 900 ? 70 : 80;
-    let textRight = containerRect.width - gap - 6;
+    let gap = 12;
     let h = containerRect.height;
-    let verticalPercent = window.innerWidth <= 600 ? 0.45 : 0.47;
+    let verticalPercent = window.innerWidth <= 600 ? 0.46 : 0.475;
     let centerPanelRect = centerPanel.getBoundingClientRect();
-    let square2StartY = centerPanelRect.bottom - containerRect.top + 6;
+    let square2StartY = centerPanelRect.bottom - containerRect.top + 4;
     
     let square2EndPos = {
-        x: textRight - estimatedTextWidth - gap - 6,
+        x: gap + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 8 + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 8 + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 4, // Left gap + 3 panels + 2 gaps + half gap
         y: square2StartY - h * verticalPercent
     };
     
     // Teleport square1 to square2's end position
-    square1.style.left = (square2EndPos.x - 6) + 'px';
-    square1.style.top = (square2EndPos.y - 6) + 'px';
+    square1.style.left = (square2EndPos.x - 4) + 'px';
+    square1.style.top = (square2EndPos.y - 4) + 'px';
     
     updatePanels();
 }
@@ -697,6 +717,39 @@ function updateFixedTextClipping() {
     
     // Apply the clip-path
     fixedText.style.clipPath = `polygon(${clipLeft}% ${clipTop}%, ${100 - clipRight}% ${clipTop}%, ${100 - clipRight}% ${100 - clipBottom}%, ${clipLeft}% ${100 - clipBottom}%)`;
+}
+
+function updateFixedTextTRClipping() {
+    let fixedTextTR = document.getElementById('fixed-text-tr');
+    let pTR = document.getElementById('panel-top-right');
+    
+    if (!fixedTextTR || !pTR) return;
+    
+    let container = document.getElementById('main-container');
+    let containerRect = container.getBoundingClientRect();
+    let panelRect = pTR.getBoundingClientRect();
+    
+    // Calculate the panel's position relative to the viewport
+    let panelLeft = panelRect.left;
+    let panelTop = panelRect.top;
+    let panelRight = panelRect.right;
+    let panelBottom = panelRect.bottom;
+    
+    // Calculate the fixed text's position relative to the viewport
+    let textRect = fixedTextTR.getBoundingClientRect();
+    let textLeft = textRect.left;
+    let textTop = textRect.top;
+    let textRight = textRect.right;
+    let textBottom = textRect.bottom;
+    
+    // Create a clip-path that clips the text to the panel boundaries
+    let clipLeft = Math.max(0, (panelLeft - textLeft) / textRect.width * 100);
+    let clipTop = Math.max(0, (panelTop - textTop) / textRect.height * 100);
+    let clipRight = Math.min(100, (textRight - panelRight) / textRect.width * 100);
+    let clipBottom = Math.min(100, (textBottom - panelBottom) / textRect.height * 100);
+    
+    // Apply the clip-path
+    fixedTextTR.style.clipPath = `polygon(${clipLeft}% ${clipTop}%, ${100 - clipRight}% ${clipTop}%, ${100 - clipRight}% ${100 - clipBottom}%, ${clipLeft}% ${100 - clipBottom}%)`;
 }
 
 function blinkProjectsText() {
@@ -771,6 +824,18 @@ function onProjectsClick(e) {
     // Prevent clicking during animations
     if (clickLocked || animating) return;
     
+    // Close any open accordion panel before proceeding
+    if (window.closeAnyOpenAccordionAsync) {
+        window.closeAnyOpenAccordionAsync().then(() => {
+            // Continue with Projects panel logic after accordion closes
+            continueProjectsAnimation();
+        });
+        return; // Exit early, animation will continue in the promise
+    }
+    
+}
+
+function continueProjectsAnimation() {
     if (currentMode === 'square1' && square1InExtendedMode) {
         // Extended mode is active, reverse the S-curve movement
         animateSquare1FromSquare2ToSquare1Position();
@@ -778,24 +843,22 @@ function onProjectsClick(e) {
         // Check if square1 is at square2's end position (extended mode trigger)
         let container = document.getElementById('main-container');
         let containerRect = container.getBoundingClientRect();
-        let gap = 8;
-        let estimatedTextWidth = window.innerWidth <= 600 ? 50 : window.innerWidth <= 900 ? 70 : 80;
-        let textRight = containerRect.width - gap - 6;
+        let gap = 12;
         let h = containerRect.height;
-        let verticalPercent = window.innerWidth <= 600 ? 0.45 : 0.47;
+        let verticalPercent = window.innerWidth <= 600 ? 0.46 : 0.475;
         let centerPanelRect = centerPanel.getBoundingClientRect();
-        let square2StartY = centerPanelRect.bottom - containerRect.top + 6;
+        let square2StartY = centerPanelRect.bottom - containerRect.top + 4;
         
         let square2EndPos = {
-            x: textRight - estimatedTextWidth - gap - 6,
+            x: gap + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 8 + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 8 + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 4, // Left gap + 3 panels + 2 gaps + half gap
             y: square2StartY - h * verticalPercent
         };
         
         // Check if square1 is at square2's end position
         let square1Rect = square1.getBoundingClientRect();
         let containerRect2 = container.getBoundingClientRect();
-        let square1X = square1Rect.left - containerRect2.left + 6;
-        let square1Y = square1Rect.top - containerRect2.top + 6;
+        let square1X = square1Rect.left - containerRect2.left + 4;
+        let square1Y = square1Rect.top - containerRect2.top + 4;
         
         if (Math.abs(square1X - square2EndPos.x) < 2 && Math.abs(square1Y - square2EndPos.y) < 2) {
             // Square1 is at square2's end position, trigger extended mode
@@ -825,7 +888,10 @@ function onProjectsClick(e) {
         square1InExtendedMode = false; // Reset extended mode
     }
     
-    blinkProjectsText();
+    // Only blink if the panel is not expanded and not animating (desktop only)
+    if (window.innerWidth <= 600 || !(currentMode === 'square2' || square1InExtendedMode || (currentMode === 'square1' && square1Extended) || animating)) {
+        blinkProjectsText();
+    }
 }
 
 function onAboutClick(e) {
@@ -835,6 +901,20 @@ function onAboutClick(e) {
     // Prevent clicking during animations
     if (clickLocked || animating) return;
     
+    // Close any open accordion panel before proceeding
+    if (window.closeAnyOpenAccordionAsync) {
+        window.closeAnyOpenAccordionAsync().then(() => {
+            // Continue with About panel logic after accordion closes
+            continueAboutAnimation();
+        });
+        return; // Exit early, animation will continue in the promise
+    }
+    
+    // If no accordion to close, continue immediately
+    continueAboutAnimation();
+}
+
+function continueAboutAnimation() {
     if (currentMode === 'square1' && square1Extended && !square1InExtendedMode) {
         // Square1 is in its end position, move it to square2's end position
         currentMode = 'square1';
@@ -874,7 +954,10 @@ function onAboutClick(e) {
         }
     }
     
-    blinkAboutText();
+    // Only blink if the panel is not expanded and not animating (desktop only)
+    if (window.innerWidth <= 600 || !(currentMode === 'square2' || square1InExtendedMode || (currentMode === 'square1' && square1Extended) || animating)) {
+        blinkAboutText();
+    }
 }
 
 function onTopLeftClick(e) {
@@ -900,8 +983,57 @@ function onBottomRightClick(e) {
     // Prevent clicking during animations
     if (clickLocked || animating) return;
     
-    // For now, just blink the text and panel
+    // Blink the text and panel
     blinkBottomRightText();
+    
+    // Smooth scroll to center of bottom-right panel at top of screen
+    const bottomRightPanel = document.getElementById('panel-bottom-right');
+    if (bottomRightPanel) {
+        const panelRect = bottomRightPanel.getBoundingClientRect();
+        const panelCenter = panelRect.top + (panelRect.height / 2);
+        const targetScroll = window.pageYOffset + panelCenter;
+        
+        // Custom smooth scroll with gradual acceleration and deceleration
+        const startPosition = window.pageYOffset;
+        const distance = targetScroll - startPosition;
+        const duration = 1800; // 1.8 seconds - shorter and smoother
+        let startTime = null;
+        let isScrolling = true;
+        
+        function smoothScrollToGallery(currentTime) {
+            if (!startTime) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const progress = Math.min(timeElapsed / duration, 1);
+            
+            // Smoother easing: gentle start, smooth middle, gentle end
+            // Using a single cubic curve for more consistent motion
+            const easeProgress = progress < 0.5 
+                ? 4 * progress * progress * progress 
+                : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+            
+            // Update scroll position
+            const newPosition = startPosition + (distance * easeProgress);
+            window.scrollTo(0, newPosition);
+            
+            // Continue animation if not complete
+            if (progress < 1 && isScrolling) {
+                requestAnimationFrame(smoothScrollToGallery);
+            }
+        }
+        
+        // Start the smooth scroll animation
+        requestAnimationFrame(smoothScrollToGallery);
+        
+        // Allow interruption by user scroll
+        const handleUserScroll = () => {
+            isScrolling = false;
+            window.removeEventListener('wheel', handleUserScroll);
+            window.removeEventListener('touchmove', handleUserScroll);
+        };
+        
+        window.addEventListener('wheel', handleUserScroll, { passive: true });
+        window.addEventListener('touchmove', handleUserScroll, { passive: true });
+    }
 }
 
 function onCenterClick(e) {
@@ -919,7 +1051,7 @@ function recalcPositions() {
     let container = document.getElementById('main-container');
     let containerRect = container.getBoundingClientRect();
     let centerPanelRect = centerPanel.getBoundingClientRect();
-    let gap = 8;
+    let gap = 12;
     
     if (currentMode === 'square1') {
         // Square1 positions (existing logic)
@@ -927,19 +1059,16 @@ function recalcPositions() {
         let centerPanelBottom = centerPanelRect.bottom - containerRect.top;
         
         startPos = {
-            x: containerRect.width / 2,
-            y: centerPanelTop - 6
+            x: Math.round(containerRect.width / 2),
+            y: centerPanelTop - 4
         };
         
-        // Calculate end position based on fixed left edge + estimated text width
-        let estimatedTextWidth = window.innerWidth <= 600 ? 65 : window.innerWidth <= 900 ? 85 : 105; // Responsive width for "Eskil Haakonsson" text
-        let textLeft = gap + 6; // Left edge of text (gap + text-to-border gap)
-        
+        // Calculate end position based on 25% of container width
         let h = containerRect.height;
-        let verticalPercent = window.innerWidth <= 600 ? 0.48 : 0.5;
+        let verticalPercent = window.innerWidth <= 600 ? 0.49 : 0.503;
         
         endPos = {
-            x: textLeft + estimatedTextWidth + gap + 6,
+            x: gap + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 4, // Left gap + panel width + half gap
             y: startPos.y + h * verticalPercent
         };
     } else {
@@ -948,36 +1077,66 @@ function recalcPositions() {
         let centerPanelBottom = centerPanelRect.bottom - containerRect.top;
         
         startPos = {
-            x: containerRect.width / 2,
-            y: centerPanelBottom + 6
+            x: Math.round(containerRect.width / 2),
+            y: centerPanelBottom + 4
         };
         
-        // Calculate end position based on fixed right edge - estimated text width
-        let estimatedTextWidth = window.innerWidth <= 600 ? 50 : window.innerWidth <= 900 ? 70 : 80; // Responsive width for "Gallery" text
-        let textRight = containerRect.width - gap - 6; // Right edge of text (container width - gap - text-to-border gap)
-        
+        // Calculate end position based on 75% of container width
         let h = containerRect.height;
-        let verticalPercent = window.innerWidth <= 600 ? 0.45 : 0.47;
+        let verticalPercent = window.innerWidth <= 600 ? 0.46 : 0.475;
         
         endPos = {
-            x: textRight - estimatedTextWidth - gap - 6,
+            x: gap + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 8 + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 8 + (containerRect.width - gap - gap - 8 - 8 - 8) / 4 + 4, // Left gap + 3 panels + 2 gaps + half gap
             y: startPos.y - h * verticalPercent
         };
     }
 }
 
+// Initialize Lenis smooth scrolling
+let lenis;
+
+// Disable scroll restoration to prevent browser from remembering scroll position
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+
 // Initialize on load
 window.addEventListener('load', function() {
+    // Initialize Lenis
+    lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        direction: 'vertical',
+        gestureDirection: 'vertical',
+        smooth: true,
+        mouseMultiplier: 1,
+        smoothTouch: false,
+        touchMultiplier: 2,
+        infinite: false,
+    });
+
+    // RAF loop for Lenis
+    function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // Force scroll to top on page load
+    lenis.scrollTo(0, { immediate: true });
+    
     updateSquare1();
     updateSquare2();
     updatePanels();
     recalcPositions();
 });
 
+
+
 // Event listeners
-document.getElementById('panel-tr-link').addEventListener('click', onProjectsClick);
-document.getElementById('panel-top-right').addEventListener('click', onProjectsClick);
-document.getElementById('panel-bl-link').addEventListener('click', onAboutClick);
+    document.getElementById('panel-tr-link').addEventListener('click', onProjectsClick);
+    document.getElementById('panel-top-right').addEventListener('click', onProjectsClick);
+    document.getElementById('panel-bl-link').addEventListener('click', onAboutClick);
 document.getElementById('panel-bottom-left').addEventListener('click', onAboutClick);
 document.getElementById('panel-tl-link').addEventListener('click', onTopLeftClick);
 document.getElementById('panel-top-left').addEventListener('click', onTopLeftClick);
@@ -992,4 +1151,190 @@ window.addEventListener('resize', function() {
     updateSquare2();
     updatePanels();
     recalcPositions();
+});
+
+// Initialize accordion functionality
+function initAccordion() {
+    const GAP_PX = 8;    // keep gap at 8px as requested
+    
+    let openId = null; // Track which panel is currently open
+    
+    // Function to calculate responsive rectangle dimensions
+    function calculateRectangleDimensions() {
+        // Get main container height for height constraint
+        const mainContainer = document.getElementById('main-container');
+        const containerHeight = mainContainer ? mainContainer.offsetHeight : window.innerHeight;
+        
+        // Height is fixed at 23.5% of main container height
+        const rectHeight = containerHeight * 0.235;
+        
+        // Width is calculated from height to maintain 2:3 aspect ratio (width = height × 2/3)
+        const rectWidth = rectHeight * (2/3);
+        
+        return { width: rectWidth, height: rectHeight };
+    }
+    
+    // Function to update all accordion grid layouts
+    function updateAccordionLayouts() {
+        const dimensions = calculateRectangleDimensions();
+        
+        // Update all accordion grids
+        const grids = document.querySelectorAll('.accordion-grid');
+        grids.forEach(grid => {
+            grid.style.gridTemplateColumns = `${dimensions.width}px ${dimensions.width}px`;
+        });
+        
+        // Update rectangle heights to maintain aspect ratio within height constraint
+        const rectangles = document.querySelectorAll('.accordion-grid > a');
+        rectangles.forEach(rect => {
+            rect.style.height = `${dimensions.height}px`;
+        });
+    }
+    
+    // Initial layout calculation
+    updateAccordionLayouts();
+    
+    // Update layout on window resize
+    window.addEventListener('resize', updateAccordionLayouts);
+    
+    function toggle(id) {
+        if (openId === id) {
+            // Close the currently open panel
+            openId = null;
+            closePanel(id);
+        } else {
+            // Close any open panel first, then open the clicked one
+            if (openId) {
+                closePanel(openId);
+            }
+            openId = id;
+            openPanel(id);
+        }
+    }
+    
+    function openPanel(id) {
+        const panel = document.getElementById(`panel-${id}`);
+        const trigger = document.querySelector(`[data-panel="${id}"]`);
+        
+        if (panel && trigger) {
+            // Update ARIA attributes
+            trigger.setAttribute('aria-expanded', 'true');
+            
+            // Show panel and animate height
+            panel.style.display = 'block';
+            panel.style.height = '0';
+            panel.style.overflow = 'hidden';
+            
+            // Get the natural height of the content
+            const contentHeight = panel.scrollHeight;
+            
+            // Animate to full height with slow start easing
+            requestAnimationFrame(() => {
+                panel.style.transition = 'height 0.7s cubic-bezier(0.6, 0, 0.2, 1)';
+                panel.style.height = contentHeight + 'px';
+            });
+            
+            // Fade in the black rectangles
+            const rectangles = panel.querySelectorAll('.accordion-grid > a');
+            rectangles.forEach(rect => {
+                rect.style.opacity = '0';
+                rect.style.transition = 'opacity 0.2s ease-in-out';
+                requestAnimationFrame(() => {
+                    rect.style.opacity = '1';
+                });
+            });
+        }
+    }
+    
+    function closePanel(id) {
+        const panel = document.getElementById(`panel-${id}`);
+        const trigger = document.querySelector(`[data-panel="${id}"]`);
+        
+        if (panel && trigger) {
+            // Update ARIA attributes
+            trigger.setAttribute('aria-expanded', 'false');
+            
+            // Fade out the black rectangles after a delay
+            const rectangles = panel.querySelectorAll('.accordion-grid > a');
+            setTimeout(() => {
+                rectangles.forEach(rect => {
+                    rect.style.transition = 'opacity 0.4s ease-in-out';
+                    rect.style.opacity = '0';
+                });
+            }, 300);
+            
+            // Animate height to 0 with slow start easing
+            panel.style.transition = 'height 0.7s cubic-bezier(0.6, 0, 0.2, 1)';
+            panel.style.height = '0';
+            
+            // Hide panel after animation completes
+            setTimeout(() => {
+                panel.style.display = 'none';
+            }, 700);
+        }
+    }
+    
+    // Function to close any open accordion panel
+    function closeAnyOpenAccordion() {
+        if (openId !== null) {
+            closePanel(openId);
+            openId = null;
+        }
+    }
+    
+    // Function to close any open accordion panel and return a promise
+    function closeAnyOpenAccordionAsync() {
+        return new Promise((resolve) => {
+            if (openId !== null) {
+                closePanel(openId);
+                openId = null;
+                // Wait for accordion close animation to complete (300ms)
+                setTimeout(resolve, 300);
+            } else {
+                resolve();
+            }
+        });
+    }
+    
+    // Add click handlers for accordion functionality
+    const triggers = document.querySelectorAll('.accordion-trigger');
+    triggers.forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const panelId = this.getAttribute('data-panel');
+            toggle(panelId);
+        });
+    });
+    
+    // Make closeAnyOpenAccordion available globally
+    window.closeAnyOpenAccordion = closeAnyOpenAccordion;
+    window.closeAnyOpenAccordionAsync = closeAnyOpenAccordionAsync;
+    
+    // Add click handler to Projects panel to close accordions when clicking outside triggers/rectangles
+    const projectsPanel = document.getElementById('panel-top-right');
+    if (projectsPanel) {
+        projectsPanel.addEventListener('click', function(e) {
+            // Don't close accordion if clicking on trigger text or black rectangles
+            if (e.target.closest('.accordion-trigger') || e.target.closest('.accordion-grid a')) {
+                return;
+            }
+            
+            // Close any open accordion before proceeding with Projects panel logic
+            closeAnyOpenAccordion();
+        });
+    }
+}
+
+// Initialize accordion when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    if (lenis) {
+        lenis.scrollTo(0, { immediate: true });
+    } else {
+        window.scrollTo(0, 0);
+    }
+    
+    // Initialize accordion functionality
+    initAccordion();
 }); 
