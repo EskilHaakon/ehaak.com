@@ -13,13 +13,13 @@
     --project-list-duration: 0.55s;
     --project-image-width: 94%;
     --project-image-width-portrait: calc(94% * 56 / 82);
-    --project-body-width: 50%;
+    --project-body-width: 90%;
     --home-panel-expand-ease: var(--project-list-ease);
     --home-panel-expand-duration: 0.85s;
     --home-about-fade-duration: 0.65s;
     --home-about-image-in-delay: 0.15s;
     --home-about-text-out-delay: 0.15s;
-    --home-about-text-width: 50%;
+    --home-about-text-width: 90%;
     --home-panel-gap: clamp(8.8px, calc(16 * 100vw / 1728), 16px);
     --ink-bleed: 0 0 0.58px rgba(0, 0, 0, 0.4),
         0.26px 0.19px 0.68px rgba(0, 0, 0, 0.21);
@@ -65,7 +65,7 @@ body {
     font-family: 'URW Garamond', Georgia, 'Times New Roman', serif;
     font-weight: 400;
     font-synthesis: none;
-    font-size: clamp(11px, calc(20 * 100vw / 1728), 20px);
+    font-size: clamp(11px, calc(16 * 100vw / 1728), 16px);
     line-height: 1.15;
     margin: 0;
     padding: 0;
@@ -125,27 +125,51 @@ html, body {
     gap: var(--home-panel-gap);
 }
 
-#panel-identity {
+#panel-identity-row {
     flex: 0 0 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: var(--home-panel-gap);
+}
+
+#panel-identity,
+#panel-portfolio {
+    flex: 1 1 0;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.1em;
     padding: 0;
     line-height: 1.1;
     border-color: transparent;
 }
 
-#panel-about {
-    position: relative;
+#panel-about-row {
     flex: 1 1 0;
     min-width: 0;
     min-height: 0;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: stretch;
+    gap: var(--home-panel-gap);
+}
+
+#panel-about,
+#panel-about-aside {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
     padding: 0;
     border-color: transparent;
+}
+
+#panel-about {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 #panel-right {
@@ -198,12 +222,6 @@ html, body {
     #home-name-link .mobile-name-break {
         display: none;
     }
-}
-
-#portfolio-pdf-link {
-    text-decoration: underline;
-    text-decoration-thickness: 0.75px;
-    text-underline-offset: 0.12em;
 }
 
 #home-name-link:hover,
@@ -309,7 +327,7 @@ html, body {
 
 #projects-body {
     box-sizing: border-box;
-    width: 50%;
+    width: calc((90% - var(--home-panel-gap)) / 2);
     max-width: 100%;
     margin-top: 0;
     padding-top: 1.1em;
@@ -333,9 +351,17 @@ html, body {
 }
 
 .justified-text {
+    margin: 0;
+    padding: 0;
+    display: block;
     text-align: justify;
     text-align-last: left;
-    display: block;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+    overflow-wrap: break-word;
+    word-spacing: -0.08em;
+    line-height: 1.25;
 }
 
 /* Shared project list */
@@ -484,6 +510,42 @@ html:has(body.project-page) {
     border-bottom: 1px solid var(--linecolor1);
 }
 
+.panel-pair {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: var(--home-panel-gap);
+    min-width: 0;
+    min-height: 0;
+}
+
+#project-top-row > .panel-pair {
+    flex: 1 1 0;
+}
+
+.panel-pair > .home-panel {
+    flex: 1 1 0;
+    width: 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+.panel-pair-text {
+    min-height: 100%;
+}
+
+.panel-pair-text > .home-panel {
+    min-height: 100%;
+}
+
+.panel-pair-text > .panel-empty {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: calc(100vh - 2 * var(--page-margin));
+    min-height: calc(100vh - 2 * var(--page-margin));
+}
+
 #panel-project-identity {
     flex: 1 1 0;
     min-width: 0;
@@ -580,6 +642,10 @@ html:has(body.project-page) {
     border-color: transparent;
 }
 
+.panel-empty {
+    border-color: transparent;
+}
+
 #panel-project-text {
     display: flex;
     flex-direction: column;
@@ -590,7 +656,7 @@ html:has(body.project-page) {
     position: sticky;
     top: 0;
     align-self: flex-start;
-    width: 100%;
+    width: 90%;
 }
 
 #panel-project-images {
@@ -669,7 +735,7 @@ html:has(body.project-page) {
 
 #project-body {
     box-sizing: border-box;
-    width: var(--project-body-width);
+    width: 100%;
     max-width: 100%;
     margin: 1.25em 0 0;
     padding: 0;

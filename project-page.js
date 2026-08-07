@@ -8,7 +8,7 @@
     };
     const PROJECT_PAGE_PATHS = {
         'Twelve Views of Vattlafjall': '/twelve-views-of-vattlafjall/',
-        Fieldharmonics: '/fieldharmonics/',
+        'Field Harmonics': '/fieldharmonics/',
         "Bachelor's Thesis Exhibitions": '/bachelors-thesis-exhibitions/',
         'Campus Visions': '/campus-visions/',
         'Essays on Architecture': '/essays-on-architecture/',
@@ -25,6 +25,8 @@
     const PROJECT_LIST_DURATION_MS = 550;
     const PANEL_EXPAND_MS = 850;
     const LABEL_BLINK_MS = 150;
+    // Set to true to show image captions (n/total + description from images.csv).
+    const SHOW_IMAGE_CAPTIONS = false;
 
     const panelProjects = document.getElementById('panel-projects');
     const projectsToggle = document.getElementById('projects-toggle');
@@ -394,13 +396,11 @@
 
                 const list = document.createElement('div');
                 list.className = 'project-media-list';
-                const total = rows.length;
 
                 rows.forEach(function(row, index) {
                     const file = row.file.trim();
                     const orientation = (row.orientation || '').trim().toLowerCase();
                     const description = String(row.description || '').trim();
-                    const counter = (index + 1) + '/' + total;
 
                     const figure = document.createElement('figure');
                     figure.className = 'project-media-item';
@@ -413,11 +413,15 @@
                     img.alt = description;
                     img.draggable = false;
 
-                    const caption = document.createElement('figcaption');
-                    caption.textContent = description ? (counter + '  ' + description) : counter;
-
                     figure.appendChild(img);
-                    figure.appendChild(caption);
+
+                    if (SHOW_IMAGE_CAPTIONS) {
+                        const counter = (index + 1) + '/' + rows.length;
+                        const caption = document.createElement('figcaption');
+                        caption.textContent = description ? (counter + '  ' + description) : counter;
+                        figure.appendChild(caption);
+                    }
+
                     list.appendChild(figure);
                 });
 

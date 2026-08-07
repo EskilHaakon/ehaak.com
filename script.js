@@ -8,7 +8,7 @@
     };
     const PROJECT_PAGE_PATHS = {
         'Twelve Views of Vattlafjall': '/twelve-views-of-vattlafjall/',
-        Fieldharmonics: '/fieldharmonics/',
+        'Field Harmonics': '/fieldharmonics/',
         "Bachelor's Thesis Exhibitions": '/bachelors-thesis-exhibitions/',
         'Campus Visions': '/campus-visions/',
         'Essays on Architecture': '/essays-on-architecture/',
