@@ -1,13 +1,13 @@
 (function() {
-    const PROJECT_CATEGORY_ORDER = ['architecture', 'publication', 'objects'];
+    const PROJECT_CATEGORY_ORDER = ['architecture','publication','objects'];
     const PROJECT_CATEGORY_LABELS = {
-        architecture: 'Architecture',
-        publication: 'Publication',
-        objects: 'Objects',
-        all: 'All'
+        architecture:' Architecture',
+        publication:' Publication',
+        objects:' Objects',
+        all:' All'
     };
     const PROJECT_PAGE_PATHS = {
-        'Twelve Views of Vattlafjall': '/twelve-views-of-vattlafjall/',
+        'Twelve Views of Akkajaure': '/twelve-views-of-akkajaure/',
         'Field Harmonics': '/fieldharmonics/',
         "Bachelor's Thesis Exhibitions": '/bachelors-thesis-exhibitions/',
         'Campus Visions': '/campus-visions/',
@@ -27,6 +27,8 @@
     const LABEL_BLINK_MS = 150;
     // Set to true to show image captions (n/total + description from images.csv).
     const SHOW_IMAGE_CAPTIONS = false;
+    const FILTER_STORAGE_KEY = 'ehaak-project-filter';
+    const FILTER_PREV_STORAGE_KEY = 'ehaak-project-filter-prev';
 
     const panelProjects = document.getElementById('panel-projects');
     const projectsToggle = document.getElementById('projects-toggle');
@@ -37,7 +39,7 @@
     let projectsOpen = false;
     let projectsAnimating = false;
     let filterAnimating = false;
-    let previousCategoryFilter = 'architecture';
+    let previousCategoryFilter = readStoredPreviousFilter() || 'architecture';
 
     function blinkLabel(element) {
         if (!element) return;
@@ -45,6 +47,40 @@
         window.setTimeout(function() {
             element.classList.remove('is-active');
         }, LABEL_BLINK_MS);
+    }
+
+    function readStoredFilter() {
+        try {
+            return sessionStorage.getItem(FILTER_STORAGE_KEY) || 'all';
+        } catch (e) {
+            return 'all';
+        }
+    }
+
+    function readStoredPreviousFilter() {
+        try {
+            return sessionStorage.getItem(FILTER_PREV_STORAGE_KEY) || '';
+        } catch (e) {
+            return '';
+        }
+    }
+
+    function writeStoredFilter(filter) {
+        try {
+            sessionStorage.setItem(FILTER_STORAGE_KEY, filter);
+            if (filter && filter !== 'all') {
+                sessionStorage.setItem(FILTER_PREV_STORAGE_KEY, filter);
+            }
+        } catch (e) {}
+    }
+
+    function resolveInitialFilter() {
+        const saved = readStoredFilter();
+        if (saved === 'all') return 'all';
+        if (document.querySelector('.project-filter[data-filter="' + saved + '"]')) {
+            return saved;
+        }
+        return 'all';
     }
 
     function getPanelEdgePadding() {
@@ -134,9 +170,6 @@
         buttons.forEach(function(button) {
             button.style.width = button.getBoundingClientRect().width + 'px';
         });
-        slashes.forEach(function(slash) {
-            slash.style.width = slash.getBoundingClientRect().width + 'px';
-        });
 
         buttons.forEach(function(button) {
             button.classList.toggle('is-active', button.dataset.filter === activeFilter);
@@ -156,21 +189,32 @@
         });
         entries.push({ filter: 'all', label: PROJECT_CATEGORY_LABELS.all });
 
+        const initialFilter = readStoredFilter();
+        const group = document.createElement('div');
+        group.className = 'project-filter-group';
+
         entries.forEach(function(entry, index) {
             const button = document.createElement('button');
             button.type = 'button';
-            button.className = 'project-filter' + (entry.filter === 'all' ? ' is-active' : '');
+            button.className = 'project-filter' + (entry.filter === initialFilter ? ' is-active' : '');
             button.dataset.filter = entry.filter;
             button.textContent = entry.label;
-            filterBar.appendChild(button);
+            group.appendChild(button);
 
             if (index < entries.length - 1) {
                 const slash = document.createElement('span');
                 slash.className = 'project-filter-slash';
-                slash.textContent = '/';
-                filterBar.appendChild(slash);
+                slash.textContent = ',';
+                group.appendChild(slash);
             }
         });
+
+        filterBar.appendChild(group);
+
+        const yearLabel = document.createElement('span');
+        yearLabel.className = 'project-filter-year-label';
+        yearLabel.textContent = 'Year';
+        filterBar.appendChild(yearLabel);
 
         lockFilterItemWidths();
     }
@@ -274,6 +318,7 @@
         if (activeFilter !== 'all') {
             previousCategoryFilter = activeFilter;
         }
+        writeStoredFilter(activeFilter);
 
         filterButtons.forEach(function(button) {
             button.classList.toggle('is-active', button.dataset.filter === activeFilter);
@@ -359,7 +404,7 @@
                 });
                 renderProjectFilterBar(categories);
                 renderProjectList(projects);
-                applyProjectFilter('all');
+                applyProjectFilter(resolveInitialFilter());
                 initProjectFilterControls();
                 setProjectsPanelHeight(false, true);
             },

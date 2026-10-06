@@ -5,7 +5,7 @@
     --text-dim-opacity: 0.2;
     --bordercolor1: #999;
     --bordercolor2: #ddd;
-    --page-margin: clamp(11px, calc(20 * 100vw / 1728), 20px);
+    --page-margin: clamp(11px, calc(16 * 100vw / 1728), 16px);
     --panel-edge-gap: 6px;
     --panel-text-inset: 12px;
     --text-block-width: calc(50% - 6px - 25% - var(--panel-edge-gap) - var(--panel-text-inset));
@@ -77,7 +77,7 @@ body {
     letter-spacing: -0.04em;
     font-kerning: normal;
     font-feature-settings: "kern" 1;
-    text-shadow: var(--ink-bleed);
+    text-shadow: none;
     animation: fadeIn 4s ease-out;
 }
 
@@ -238,6 +238,12 @@ html, body {
     opacity: var(--text-dim-opacity);
 }
 
+#portfolio-pdf-link.is-disabled,
+#portfolio-pdf-link.is-disabled:hover {
+    cursor: default;
+    opacity: 1;
+}
+
 #about-content {
     width: var(--home-about-text-width);
     max-width: 100%;
@@ -289,7 +295,7 @@ html, body {
 #about-image {
     width: 100%;
     max-width: 100%;
-    margin: 0 0 1em;
+    margin: 0 0 2.1em;
 }
 
 #about-image img {
@@ -378,6 +384,14 @@ html, body {
     letter-spacing: inherit;
 }
 
+.project-filter-group {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
 .project-filter {
     display: inline-block;
     flex: 0 0 auto;
@@ -390,6 +404,7 @@ html, body {
     font-style: normal;
     letter-spacing: inherit;
     color: inherit;
+    text-shadow: inherit;
     cursor: pointer;
     white-space: nowrap;
     overflow: visible;
@@ -397,16 +412,27 @@ html, body {
 
 .project-filter.is-active {
     font-style: italic;
-    transform: scaleX(1.08);
-    transform-origin: left center;
+    transform: scaleX(1.15);
+    transform-origin: center;
 }
 
 .project-filter-slash {
     flex: 0 0 auto;
+    margin: 0 0.3em 0 0;
+    padding: 0;
+    letter-spacing: inherit;
+    text-shadow: inherit;
+    white-space: nowrap;
+}
+
+.project-filter-year-label {
+    flex: 0 0 auto;
     margin: 0;
     padding: 0;
     letter-spacing: inherit;
+    text-shadow: inherit;
     white-space: nowrap;
+    text-align: right;
 }
 
 .project-list {
@@ -630,7 +656,7 @@ html:has(body.project-page) {
     align-items: stretch;
     box-sizing: border-box;
     min-height: 100%;
-    padding-bottom: 1em;
+    padding-bottom: 4em;
 }
 
 #panel-project-text,
@@ -902,7 +928,7 @@ body.not-found-page {
     font-style: normal;
     letter-spacing: inherit;
     color: var(--textcolor1);
-    text-shadow: var(--ink-bleed);
+    text-shadow: none;
     cursor: pointer;
     opacity: 0.3;
     transition: opacity 0.5s;
