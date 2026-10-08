@@ -1,10 +1,10 @@
 (function() {
     const PROJECT_CATEGORY_ORDER = ['architecture','publication','objects'];
     const PROJECT_CATEGORY_LABELS = {
-        architecture:' Architecture',
-        publication:' Publication',
-        objects:' Objects',
-        all:' All'
+        architecture:'Architecture',
+        publication:'Publication',
+        objects:'Objects',
+        all:'All'
     };
     const PROJECT_PAGE_PATHS = {
         'Twelve Views of Akkajaure': '/twelve-views-of-akkajaure/',
@@ -457,6 +457,9 @@
                     img.src = encodeURI(imagesPath + file);
                     img.alt = description;
                     img.draggable = false;
+                    img.addEventListener('error', function() {
+                        figure.remove();
+                    });
 
                     figure.appendChild(img);
 
